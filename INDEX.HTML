@@ -47,6 +47,7 @@
             --animate-pulse: pulse 2s infinite;
             --animate-shake: shake 0.5s ease;
             --animate-float: float 3s ease-in-out infinite;
+            --animate-wiggle: wiggle 0.5s ease;
         }
 
         [data-theme="dark"] {
@@ -77,6 +78,10 @@
         @keyframes gradient-shift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes bounce-in { 0% { transform: scale(0.3); opacity: 0; } 50% { transform: scale(1.05); } 70% { transform: scale(0.9); } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes wiggle { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-10deg); } 75% { transform: rotate(10deg); } }
+        @keyframes stock-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        @keyframes heart-beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+        @keyframes delivery-truck { 0% { transform: translateX(0); } 100% { transform: translateX(100px); } }
 
         /* ============================================
            RESET Y BASE
@@ -98,7 +103,7 @@
 
         a { text-decoration: none; color: inherit; transition: var(--transition); }
         a:hover { color: var(--primary); }
-        img { max-width: 100%; height: auto; display: block; }
+        img { max-width: 100%; height: auto; display: block; user-select: none; }
         button { font-family: inherit; cursor: pointer; }
         button:disabled { opacity: 0.6; cursor: not-allowed; }
 
@@ -319,7 +324,8 @@
         
         .theme-toggle,
         .compare-toggle,
-        .user-toggle {
+        .user-toggle,
+        .wishlist-toggle {
             background: var(--bg-input);
             border: 2px solid var(--border-color);
             color: var(--text-primary);
@@ -336,7 +342,8 @@
         }
         .theme-toggle::before,
         .compare-toggle::before,
-        .user-toggle::before {
+        .user-toggle::before,
+        .wishlist-toggle::before {
             content: '';
             position: absolute;
             width: 100%;
@@ -349,10 +356,12 @@
         }
         .theme-toggle:hover::before,
         .compare-toggle:hover::before,
-        .user-toggle:hover::before { transform: scale(1); }
+        .user-toggle:hover::before,
+        .wishlist-toggle:hover::before { transform: scale(1); }
         .theme-toggle:hover,
         .compare-toggle:hover,
-        .user-toggle:hover {
+        .user-toggle:hover,
+        .wishlist-toggle:hover {
             border-color: var(--primary);
             color: #fff;
             transform: translateY(-2px);
@@ -361,6 +370,10 @@
             background: var(--primary);
             border-color: var(--primary);
             color: white;
+        }
+        .wishlist-toggle.active {
+            color: var(--error);
+            border-color: var(--error);
         }
         
         .cart-btn {
@@ -899,6 +912,39 @@
         }
         .product-card:hover::before { opacity: 1; }
         
+        /* Wishlist Button */
+        .wishlist-btn {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            z-index: 3;
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-secondary);
+            font-size: 14px;
+            box-shadow: var(--shadow);
+        }
+        .wishlist-btn:hover {
+            border-color: var(--error);
+            color: var(--error);
+            transform: scale(1.1);
+        }
+        .wishlist-btn.active {
+            background: var(--error);
+            border-color: var(--error);
+            color: #fff;
+            animation: heart-beat 0.4s ease;
+        }
+        
+        /* Compare Checkbox */
         .compare-checkbox {
             position: absolute;
             top: 14px;
@@ -983,7 +1029,7 @@
         
         .product-badge {
             position: absolute;
-            top: 14px;
+            top: 54px;
             left: 14px;
             background: var(--primary);
             color: #fff;
@@ -996,6 +1042,34 @@
             z-index: 2;
             animation: bounce-in 0.5s ease;
             box-shadow: 0 4px 12px rgba(255,107,0,0.3);
+        }
+        
+        /* Stock Indicator */
+        .stock-indicator {
+            position: absolute;
+            bottom: 14px;
+            left: 14px;
+            background: rgba(255,255,255,0.95);
+            color: var(--text-primary);
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: var(--shadow);
+            z-index: 2;
+            animation: stock-pulse 2s ease-in-out infinite;
+        }
+        .stock-indicator.low {
+            background: var(--warning);
+            color: #212529;
+        }
+        .stock-indicator.very-low {
+            background: var(--error);
+            color: #fff;
+            animation: shake 0.5s ease;
         }
         
         .product-info {
@@ -1583,6 +1657,68 @@
             gap: 32px;
             padding: 32px;
         }
+        
+        /* 360° Viewer Styles */
+        .viewer-360 {
+            position: relative;
+            height: 380px;
+            background: var(--bg-hover);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            cursor: grab;
+            user-select: none;
+        }
+        .viewer-360:active { cursor: grabbing; }
+        .viewer-360 img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.1s ease-out;
+            pointer-events: none;
+        }
+        .viewer-360 .viewer-hint {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            animation: float 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+        .viewer-360 .viewer-controls {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            display: flex;
+            gap: 8px;
+        }
+        .viewer-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+        .viewer-btn:hover {
+            background: var(--primary);
+            color: #fff;
+            transform: scale(1.1);
+        }
+        
         .modal-image {
             height: 380px;
             background: var(--bg-hover);
@@ -1598,6 +1734,52 @@
             transition: transform 0.5s ease;
         }
         .modal-image:hover img { transform: scale(1.05); }
+        
+        /* Video Modal Styles */
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: var(--radius-sm);
+            background: #000;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .video-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--secondary), var(--secondary-light));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .video-placeholder:hover {
+            background: linear-gradient(135deg, var(--secondary-light), var(--primary-dark));
+        }
+        .video-placeholder i {
+            font-size: 48px;
+            margin-bottom: 12px;
+            animation: pulse 2s infinite;
+        }
+        .video-placeholder span {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
         .modal-info h2 {
             font-size: 24px;
             font-weight: 800;
@@ -1645,6 +1827,178 @@
         .modal-specs ul li:last-child { border-bottom: none; }
         .modal-specs ul li span:first-child { color: var(--text-secondary); }
         .modal-specs ul li span:last-child { font-weight: 600; }
+        
+        /* Size Guide Modal */
+        .size-guide-modal .modal-content { max-width: 700px; }
+        .size-guide-modal .modal-body {
+            grid-template-columns: 1fr;
+            padding: 28px;
+        }
+        .size-guide-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+        .size-guide-tab {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+        .size-guide-tab.active {
+            color: var(--primary);
+            background: var(--bg-hover);
+            border-bottom: 2px solid var(--primary);
+            margin-bottom: -14px;
+        }
+        .size-guide-content { display: none; }
+        .size-guide-content.active { display: block; animation: fade-in 0.3s ease; }
+        
+        .size-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+        .size-table th,
+        .size-table td {
+            padding: 12px 16px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+        .size-table th {
+            background: var(--bg-hover);
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .size-table tr:hover { background: var(--bg-hover); }
+        
+        .size-converter {
+            background: var(--bg-hover);
+            padding: 20px;
+            border-radius: var(--radius-sm);
+            margin-top: 20px;
+        }
+        .size-converter h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+        .converter-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        .converter-select {
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .converter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .converter-result {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 12px;
+            background: var(--primary);
+            color: #fff;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            margin-top: 12px;
+        }
+        
+        /* Delivery Estimator */
+        .delivery-estimator {
+            background: var(--bg-hover);
+            padding: 20px;
+            border-radius: var(--radius-sm);
+            margin-top: 20px;
+        }
+        .delivery-estimator h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .delivery-form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .delivery-form select,
+        .delivery-form input {
+            flex: 1;
+            min-width: 150px;
+            padding: 10px 14px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        .delivery-form select:focus,
+        .delivery-form input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .delivery-form button {
+            padding: 10px 20px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .delivery-form button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        .delivery-result {
+            margin-top: 16px;
+            padding: 16px;
+            background: var(--bg-card);
+            border-radius: var(--radius-sm);
+            border-left: 4px solid var(--primary);
+            display: none;
+        }
+        .delivery-result.show {
+            display: block;
+            animation: slide-up 0.3s ease;
+        }
+        .delivery-result .truck-icon {
+            font-size: 24px;
+            color: var(--primary);
+            margin-right: 8px;
+            animation: delivery-truck 1s ease-in-out infinite;
+        }
+        .delivery-result strong {
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+        .delivery-result p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin: 4px 0 0;
+        }
         
         .size-selector { margin-bottom: 22px; }
         .size-selector h4 {
@@ -2191,7 +2545,7 @@
             .hero-content { text-align: center; }
             .hero-badges, .hero-buttons { justify-content: center; }
             .hero p { margin-left: auto; margin-right: auto; }
-            .modal-image { height: 320px; }
+            .modal-image, .viewer-360 { height: 320px; }
             .featured-image img { height: 420px; }
             .featured-specs { grid-template-columns: 1fr 1fr; }
             .search-container { order: 3; width: 100%; max-width: none; margin-top: 14px; }
@@ -2227,13 +2581,19 @@
             
             .cart-sidebar { width: 100%; right: -100%; }
             .modal-body { padding: 24px; gap: 24px; }
-            .modal-image { height: 280px; }
+            .modal-image, .viewer-360 { height: 280px; }
             
             .filter-bar { flex-direction: column; align-items: stretch; }
             .search-info { justify-content: center; }
             
             .compare-bar .container { flex-direction: column; align-items: stretch; }
             .compare-actions { justify-content: center; }
+            
+            .converter-grid { grid-template-columns: 1fr; }
+            .delivery-form { flex-direction: column; }
+            .delivery-form select,
+            .delivery-form input,
+            .delivery-form button { width: 100%; }
         }
 
         @media (max-width: 480px) {
@@ -2242,7 +2602,7 @@
             .header-main { padding: 10px 0; }
             .logo { font-size: 22px; }
             .cart-btn { padding: 9px 16px; font-size: 12px; }
-            .theme-toggle, .compare-toggle, .user-toggle { width: 38px; height: 38px; font-size: 14px; }
+            .theme-toggle, .compare-toggle, .user-toggle, .wishlist-toggle { width: 38px; height: 38px; font-size: 14px; }
             
             .hero h1 { font-size: 26px; }
             .hero p { font-size: 15px; }
@@ -2267,6 +2627,9 @@
             .compare-table { font-size: 13px; }
             .compare-table th, .compare-table td { padding: 12px 14px; }
             .compare-table .product-header img { width: 70px; height: 70px; }
+            
+            .size-guide-tabs { flex-wrap: wrap; }
+            .size-guide-tab { padding: 8px 14px; font-size: 13px; }
         }
 
         /* Print styles */
@@ -2331,6 +2694,9 @@
                     </button>
                     <button class="compare-toggle" id="compareToggle" title="Comparar" disabled>
                         <i class="fas fa-table-columns"></i>
+                    </button>
+                    <button class="wishlist-toggle" id="wishlistToggle" title="Mis favoritos">
+                        <i class="fas fa-heart"></i>
                     </button>
                     <button class="user-toggle" id="userToggle" title="Mi cuenta">
                         <i class="fas fa-user"></i>
@@ -2621,19 +2987,41 @@
         </div>
     </footer>
 
-    <!-- Product Modal -->
+    <!-- Product Modal with 360° Viewer -->
     <div class="modal" id="productModal">
         <div class="modal-content">
             <button class="modal-close" id="closeModal"><i class="fas fa-times"></i></button>
             <div class="modal-body">
-                <div class="modal-image">
-                    <img id="modalImage" src="" alt="Producto">
+                <!-- 360° Viewer -->
+                <div class="viewer-360" id="viewer360">
+                    <img id="viewerImage" src="" alt="Vista 360° del producto">
+                    <div class="viewer-hint">
+                        <i class="fas fa-hand-pointer"></i> Arrastra para rotar
+                    </div>
+                    <div class="viewer-controls">
+                        <button class="viewer-btn" id="viewerRotateLeft" title="Rotar izquierda">
+                            <i class="fas fa-rotate-left"></i>
+                        </button>
+                        <button class="viewer-btn" id="viewerRotateRight" title="Rotar derecha">
+                            <i class="fas fa-rotate-right"></i>
+                        </button>
+                        <button class="viewer-btn" id="viewerReset" title="Resetear vista">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
                 </div>
+                
                 <div class="modal-info">
                     <div class="modal-category" id="modalCategory">Categoría</div>
                     <h2 id="modalTitle">Producto</h2>
                     <div class="product-rating" id="modalStars">★★★★★</div>
                     <p class="modal-description" id="modalDescription">Descripción</p>
+                    
+                    <!-- Stock Indicator in Modal -->
+                    <div class="stock-indicator" id="modalStock">
+                        <i class="fas fa-box"></i>
+                        <span id="stockText">En stock</span>
+                    </div>
                     
                     <div class="modal-specs">
                         <h4><i class="fas fa-cogs"></i> Especificaciones</h4>
@@ -2645,8 +3033,15 @@
                         </ul>
                     </div>
                     
+                    <!-- Size Selector with Guide -->
                     <div class="size-selector">
-                        <h4><i class="fas fa-ruler"></i> Talla</h4>
+                        <h4>
+                            <i class="fas fa-ruler"></i> Talla
+                            <button class="btn-quote" style="padding:4px 12px;font-size:11px;margin-left:8px" 
+                                    onclick="openSizeGuide()">
+                                <i class="fas fa-question-circle"></i> Guía de tallas
+                            </button>
+                        </h4>
                         <div class="size-options">
                             <button class="size-btn">XS</button>
                             <button class="size-btn active">S</button>
@@ -2654,6 +3049,30 @@
                             <button class="size-btn">L</button>
                             <button class="size-btn">XL</button>
                             <button class="size-btn">2XL</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Delivery Estimator -->
+                    <div class="delivery-estimator">
+                        <h4><i class="fas fa-truck"></i> Tiempo de entrega</h4>
+                        <div class="delivery-form">
+                            <select id="deliveryCity">
+                                <option value="">Selecciona tu ciudad</option>
+                                <option value="bogota">Bogotá</option>
+                                <option value="medellin">Medellín</option>
+                                <option value="cali">Cali</option>
+                                <option value="barranquilla">Barranquilla</option>
+                                <option value="cartagena">Cartagena</option>
+                                <option value="bucaramanga">Bucaramanga</option>
+                                <option value="pereira">Pereira</option>
+                                <option value="otras">Otra ciudad</option>
+                            </select>
+                            <button onclick="calculateDelivery()">Calcular</button>
+                        </div>
+                        <div class="delivery-result" id="deliveryResult">
+                            <i class="fas fa-truck truck-icon"></i>
+                            <strong id="deliveryTime">-</strong>
+                            <p id="deliveryDetails">-</p>
                         </div>
                     </div>
                     
@@ -2666,6 +3085,11 @@
                         </div>
                     </div>
                     
+                    <!-- Video Demo Button -->
+                    <button class="btn-quote" style="width:100%;margin-bottom:16px" onclick="openVideoModal()">
+                        <i class="fas fa-play-circle"></i> Ver demostración en video
+                    </button>
+                    
                     <div class="modal-actions">
                         <button class="btn-add-cart" id="addToCartBtn">
                             <i class="fas fa-cart-plus"></i> Agregar
@@ -2675,6 +3099,135 @@
                         </button>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Size Guide Modal -->
+    <div class="modal size-guide-modal" id="sizeGuideModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeSizeGuide()"><i class="fas fa-times"></i></button>
+            <div class="modal-body">
+                <h2><i class="fas fa-ruler-combined"></i> Guía de Tallas</h2>
+                <p style="color:var(--text-secondary);margin-bottom:20px">
+                    Encuentra tu talla perfecta con nuestra guía interactiva
+                </p>
+                
+                <div class="size-guide-tabs">
+                    <button class="size-guide-tab active" data-tab="hombres" onclick="switchSizeTab('hombres')">👨 Hombres</button>
+                    <button class="size-guide-tab" data-tab="mujeres" onclick="switchSizeTab('mujeres')">👩 Mujeres</button>
+                    <button class="size-guide-tab" data-tab="conversion" onclick="switchSizeTab('conversion')">🔄 Conversor</button>
+                </div>
+                
+                <!-- Hombres -->
+                <div class="size-guide-content active" id="tab-hombres">
+                    <table class="size-table">
+                        <thead>
+                            <tr>
+                                <th>Talla</th>
+                                <th>Pecho (cm)</th>
+                                <th>Cintura (cm)</th>
+                                <th>Cadera (cm)</th>
+                                <th>Altura (cm)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>XS</td><td>86-91</td><td>71-76</td><td>86-91</td><td>160-165</td></tr>
+                            <tr><td>S</td><td>91-96</td><td>76-81</td><td>91-96</td><td>165-170</td></tr>
+                            <tr><td>M</td><td>96-101</td><td>81-86</td><td>96-101</td><td>170-175</td></tr>
+                            <tr><td>L</td><td>101-106</td><td>86-91</td><td>101-106</td><td>175-180</td></tr>
+                            <tr><td>XL</td><td>106-111</td><td>91-96</td><td>106-111</td><td>180-185</td></tr>
+                            <tr><td>2XL</td><td>111-121</td><td>96-106</td><td>111-121</td><td>185-190</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Mujeres -->
+                <div class="size-guide-content" id="tab-mujeres">
+                    <table class="size-table">
+                        <thead>
+                            <tr>
+                                <th>Talla</th>
+                                <th>Pecho (cm)</th>
+                                <th>Cintura (cm)</th>
+                                <th>Cadera (cm)</th>
+                                <th>Altura (cm)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>XS</td><td>81-86</td><td>66-71</td><td>86-91</td><td>155-160</td></tr>
+                            <tr><td>S</td><td>86-91</td><td>71-76</td><td>91-96</td><td>160-165</td></tr>
+                            <tr><td>M</td><td>91-96</td><td>76-81</td><td>96-101</td><td>165-170</td></tr>
+                            <tr><td>L</td><td>96-101</td><td>81-86</td><td>101-106</td><td>170-175</td></tr>
+                            <tr><td>XL</td><td>101-106</td><td>86-91</td><td>106-111</td><td>175-180</td></tr>
+                            <tr><td>2XL</td><td>106-116</td><td>91-101</td><td>111-121</td><td>180-185</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Conversor -->
+                <div class="size-guide-content" id="tab-conversion">
+                    <div class="size-converter">
+                        <h4>Conversor de Tallas Internacionales</h4>
+                        <div class="converter-grid">
+                            <select class="converter-select" id="convertFrom">
+                                <option value="co">🇨🇴 Colombia</option>
+                                <option value="us">🇺🇸 EE.UU.</option>
+                                <option value="eu">🇪🇺 Europa</option>
+                                <option value="uk">🇬🇧 Reino Unido</option>
+                            </select>
+                            <select class="converter-select" id="convertSize">
+                                <option value="XS">XS</option>
+                                <option value="S" selected>S</option>
+                                <option value="M">M</option>
+                                <option value="L">L</option>
+                                <option value="XL">XL</option>
+                                <option value="2XL">2XL</option>
+                            </select>
+                            <select class="converter-select" id="convertTo">
+                                <option value="co">🇨🇴 Colombia</option>
+                                <option value="us">🇺🇸 EE.UU.</option>
+                                <option value="eu" selected>🇪🇺 Europa</option>
+                                <option value="uk">🇬🇧 Reino Unido</option>
+                            </select>
+                            <div class="converter-result" id="converterResult">
+                                S (CO) = M (EU)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top:24px;padding:16px;background:var(--bg-hover);border-radius:var(--radius-sm)">
+                    <strong>💡 Tips para medir:</strong>
+                    <ul style="margin-top:8px;color:var(--text-secondary);font-size:14px;line-height:1.6">
+                        <li>Usa una cinta métrica flexible</li>
+                        <li>Mide sobre ropa interior o ropa ajustada</li>
+                        <li>Pecho: alrededor de la parte más ancha</li>
+                        <li>Cintura: en el punto más estrecho</li>
+                        <li>Cadera: alrededor de la parte más ancha de las caderas</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Modal -->
+    <div class="modal" id="videoModal">
+        <div class="modal-content" style="max-width:900px">
+            <button class="modal-close" onclick="closeVideoModal()"><i class="fas fa-times"></i></button>
+            <div class="modal-body" style="grid-template-columns:1fr;padding:20px">
+                <h2 style="margin-bottom:16px"><i class="fas fa-video"></i> Demostración de Producto</h2>
+                <div class="video-container" id="videoContainer">
+                    <!-- Placeholder before video loads -->
+                    <div class="video-placeholder" id="videoPlaceholder" onclick="loadVideo()">
+                        <i class="fas fa-play-circle"></i>
+                        <span>Click para reproducir demostración</span>
+                    </div>
+                    <!-- YouTube iframe (loaded on click) -->
+                </div>
+                <p style="margin-top:20px;color:var(--text-secondary);font-size:14px">
+                    <i class="fas fa-info-circle"></i> Video demostrativo de las características de protección y comodidad del producto.
+                </p>
             </div>
         </div>
     </div>
@@ -2695,6 +3248,29 @@
                     <button class="btn btn-secondary" id="closeCompare">Cerrar</button>
                     <button class="btn-generate-pdf" id="generatePdf">
                         <i class="fas fa-file-pdf"></i> Descargar PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wishlist Modal -->
+    <div class="modal" id="wishlistModal">
+        <div class="modal-content" style="max-width:700px">
+            <button class="modal-close" onclick="closeWishlist()"><i class="fas fa-times"></i></button>
+            <div class="modal-body" style="grid-template-columns:1fr;padding:28px">
+                <h2><i class="fas fa-heart"></i> Mis Favoritos</h2>
+                <p style="color:var(--text-secondary);margin-bottom:20px">
+                    Productos que has guardado para más tarde
+                </p>
+                <div id="wishlistItems" style="max-height:400px;overflow-y:auto">
+                    <!-- Wishlist items rendered here -->
+                </div>
+                <div id="wishlistEmpty" class="text-center" style="padding:40px;color:var(--text-secondary)">
+                    <i class="fas fa-heart" style="font-size:48px;margin-bottom:16px;opacity:0.3"></i>
+                    <p>No tienes productos favoritos aún</p>
+                    <button class="btn btn-secondary" onclick="closeWishlist()" style="margin-top:16px">
+                        Seguir comprando
                     </button>
                 </div>
             </div>
@@ -2745,26 +3321,144 @@
 
     <script>
         // ================================================================
-        // DATOS DE PRODUCTOS
+        // DATOS DE PRODUCTOS CON IMÁGENES 360° Y STOCK
         // ================================================================
         const products = [
-            {id:1,name:"ARCSHIELD ULTRA PRO",category:"Arco Eléctrico",filter:"arco",image:"IMAGENES/producto1.jpg",specs:"Nomex® IIIA · ATPV 40 cal/cm² · HRC 4",description:"Overol de protección contra arco eléctrico más avanzado del mercado.",rating:5,material:"Nomex® IIIA",protection:"ATPV 40 cal/cm²",norm:"NFPA 70E, IEC 61482",weight:"4.5 oz/yd²",price:"Consultar"},
-            {id:2,name:"FIREGUARD FR PRO",category:"Fuego Repentino",filter:"fuego",image:"IMAGENES/producto2.jpg",specs:"FR Algodón 100% · 320 g/m² · ISO 11612",description:"Protección completa contra fuego repentino para industrias con riesgo de combustión.",rating:5,material:"FR Algodón 100%",protection:"ISO 11612 A3/B3/C3",norm:"NFPA 2112, ISO 11612",weight:"320 g/m²",price:"Consultar"},
-            {id:3,name:"SENTINEL X900",category:"Multiprotección",filter:"multi",image:"IMAGENES/producto3.jpg",specs:"Multicapa FR · ISO 11612 + IEC 61482",description:"Protección integral para zonas ATEX con riesgo combinado.",rating:5,material:"Multicapa FR",protection:"Multi-norma",norm:"ATEX Cat.3, NFPA 70E",weight:"280 g/m²",price:"Consultar"},
-            {id:4,name:"PETROGUARD ELITE",category:"Petroquímica",filter:"petro",image:"IMAGENES/producto4.jpg",specs:"FR Modacryl · 260 g/m² · Antiestático",description:"Especialmente diseñado para la industria petroquímica.",rating:4,material:"FR Modacryl",protection:"Antiestático + FR",norm:"ATEX, NFPA 2112",weight:"260 g/m²",price:"Consultar"},
-            {id:5,name:"ARCTECH HRC2",category:"Arco Eléctrico",filter:"arco",image:"IMAGENES/producto5.jpg",specs:"Indura® · ATPV 8 cal/cm² · Cat.2",description:"Protección ligera y flexible para riesgo eléctrico medio.",rating:4,material:"Indura® Cotton",protection:"ATPV 8 cal/cm²",norm:"NFPA 70E Cat.2",weight:"200 g/m²",price:"Consultar"},
-            {id:6,name:"THERMOMAX 700",category:"Fundición",filter:"fuego",image:"IMAGENES/producto6.jpg",specs:"Vaqueta tratada · Clase E3/F3 · 400°C",description:"Protección extrema para altas temperaturas en fundiciones.",rating:4,material:"Vaqueta ignífuga",protection:"Hasta 400°C",norm:"ISO 11612 E3/F3",weight:"700 g/m²",price:"Consultar"}
+            {
+                id:1,
+                name:"ARCSHIELD ULTRA PRO",
+                category:"Arco Eléctrico",
+                filter:"arco",
+                image:"IMAGENES/producto1.jpg",
+                images360: [
+                    "IMAGENES/producto1-front.jpg",
+                    "IMAGENES/producto1-side.jpg", 
+                    "IMAGENES/producto1-back.jpg",
+                    "IMAGENES/producto1-detail.jpg"
+                ],
+                specs:"Nomex® IIIA · ATPV 40 cal/cm² · HRC 4",
+                description:"Overol de protección contra arco eléctrico más avanzado del mercado.",
+                rating:5,
+                material:"Nomex® IIIA",
+                protection:"ATPV 40 cal/cm²",
+                norm:"NFPA 70E, IEC 61482",
+                weight:"4.5 oz/yd²",
+                price:"Consultar",
+                stock: 12,
+                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
+            },
+            {
+                id:2,
+                name:"FIREGUARD FR PRO",
+                category:"Fuego Repentino",
+                filter:"fuego",
+                image:"IMAGENES/producto2.jpg",
+                images360: [
+                    "IMAGENES/producto2-front.jpg",
+                    "IMAGENES/producto2-side.jpg",
+                    "IMAGENES/producto2-back.jpg"
+                ],
+                specs:"FR Algodón 100% · 320 g/m² · ISO 11612",
+                description:"Protección completa contra fuego repentino para industrias con riesgo de combustión.",
+                rating:5,
+                material:"FR Algodón 100%",
+                protection:"ISO 11612 A3/B3/C3",
+                norm:"NFPA 2112, ISO 11612",
+                weight:"320 g/m²",
+                price:"Consultar",
+                stock: 3,
+                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
+            },
+            {
+                id:3,
+                name:"SENTINEL X900",
+                category:"Multiprotección",
+                filter:"multi",
+                image:"IMAGENES/producto3.jpg",
+                images360: ["IMAGENES/producto3.jpg"],
+                specs:"Multicapa FR · ISO 11612 + IEC 61482",
+                description:"Protección integral para zonas ATEX con riesgo combinado.",
+                rating:5,
+                material:"Multicapa FR",
+                protection:"Multi-norma",
+                norm:"ATEX Cat.3, NFPA 70E",
+                weight:"280 g/m²",
+                price:"Consultar",
+                stock: 25,
+                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
+            },
+            {
+                id:4,
+                name:"PETROGUARD ELITE",
+                category:"Petroquímica",
+                filter:"petro",
+                image:"IMAGENES/producto4.jpg",
+                images360: ["IMAGENES/producto4.jpg"],
+                specs:"FR Modacryl · 260 g/m² · Antiestático",
+                description:"Especialmente diseñado para la industria petroquímica.",
+                rating:4,
+                material:"FR Modacryl",
+                protection:"Antiestático + FR",
+                norm:"ATEX, NFPA 2112",
+                weight:"260 g/m²",
+                price:"Consultar",
+                stock: 1,
+                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
+            },
+            {
+                id:5,
+                name:"ARCTECH HRC2",
+                category:"Arco Eléctrico",
+                filter:"arco",
+                image:"IMAGENES/producto5.jpg",
+                images360: ["IMAGENES/producto5.jpg"],
+                specs:"Indura® · ATPV 8 cal/cm² · Cat.2",
+                description:"Protección ligera y flexible para riesgo eléctrico medio.",
+                rating:4,
+                material:"Indura® Cotton",
+                protection:"ATPV 8 cal/cm²",
+                norm:"NFPA 70E Cat.2",
+                weight:"200 g/m²",
+                price:"Consultar",
+                stock: 18,
+                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
+            },
+            {
+                id:6,
+                name:"THERMOMAX 700",
+                category:"Fundición",
+                filter:"fuego",
+                image:"IMAGENES/producto6.jpg",
+                images360: ["IMAGENES/producto6.jpg"],
+                specs:"Vaqueta tratada · Clase E3/F3 · 400°C",
+                description:"Protección extrema para altas temperaturas en fundiciones.",
+                rating:4,
+                material:"Vaqueta ignífuga",
+                protection:"Hasta 400°C",
+                norm:"ISO 11612 E3/F3",
+                weight:"700 g/m²",
+                price:"Consultar",
+                stock: 7,
+                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
+            }
         ];
 
         // ================================================================
         // ESTADO GLOBAL
         // ================================================================
         let cart = [];
+        let wishlist = JSON.parse(localStorage.getItem('underprotection_wishlist')) || [];
         let currentProduct = null;
         let selectedSize = 'S';
         let quantity = 1;
         let compareList = [];
         let currentTheme = localStorage.getItem('theme') || 'light';
+        
+        // 360° Viewer state
+        let viewerAngle = 0;
+        let isDragging = false;
+        let startX = 0;
+        let startAngle = 0;
 
         // ================================================================
         // UTILIDADES
@@ -2786,7 +3480,6 @@
         // ANIMACIONES Y EFECTOS
         // ================================================================
         
-        // Confetti effect
         function createConfetti(count = 50) {
             const colors = ['#FF6B00', '#2ED573', '#3742FA', '#FFA502', '#FF4757'];
             for (let i = 0; i < count; i++) {
@@ -2797,13 +3490,10 @@
                 confetti.style.animationDelay = Math.random() * 0.5 + 's';
                 confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
                 document.body.appendChild(confetti);
-                
-                // Remove after animation
                 setTimeout(() => confetti.remove(), 3000);
             }
         }
 
-        // Ripple effect on buttons
         function createRipple(event, element) {
             const ripple = document.createElement('span');
             const rect = element.getBoundingClientRect();
@@ -2827,15 +3517,12 @@
             element.style.position = 'relative';
             element.style.overflow = 'hidden';
             element.appendChild(ripple);
-            
             setTimeout(() => ripple.remove(), 600);
         }
 
-        // Counter animation
         function animateCounter(element, target, duration = 2000) {
             let start = 0;
             const increment = target / (duration / 16);
-            
             function update() {
                 start += increment;
                 if (start < target) {
@@ -2848,14 +3535,11 @@
             update();
         }
 
-        // Scroll animations (Intersection Observer)
         function setupScrollAnimations() {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('visible');
-                        
-                        // Animate counters when stats are visible
                         if (entry.target.classList.contains('stat-item')) {
                             const num = entry.target.querySelector('.stat-number');
                             if (num && !num.dataset.animated) {
@@ -2866,8 +3550,6 @@
                     }
                 });
             }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-
-            // Observe product cards and stat items
             $$('.product-card, .stat-item').forEach(el => observer.observe(el));
         }
 
@@ -2881,7 +3563,7 @@
 
         function toggleTheme() {
             currentTheme = currentTheme === 'light' ? 'dark' : 'light';
-            document.documentElement.setAttribute('data-theme', currentTheme);
+            document.documentElement.setAttribute('-theme', currentTheme);
             localStorage.setItem('theme', currentTheme);
             updateThemeIcon();
             showNotification(currentTheme === 'dark' ? '🌙 Modo oscuro' : '☀️ Modo claro', 'success');
@@ -2890,6 +3572,16 @@
         function updateThemeIcon() {
             const icon = $('#themeToggle i');
             icon.className = currentTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        }
+
+        // ================================================================
+        // STOCK INDICATOR HELPER
+        // ================================================================
+        function getStockStatus(stock) {
+            if (stock <= 0) return { class: 'very-low', text: '⚠ Agotado', show: true };
+            if (stock <= 3) return { class: 'very-low', text: `🔥 ¡Solo ${stock}!`, show: true };
+            if (stock <= 10) return { class: 'low', text: `📦 ${stock} unidades`, show: true };
+            return { class: '', text: '✅ En stock', show: true };
         }
 
         // ================================================================
@@ -2911,12 +3603,22 @@
                 return;
             }
             
-            grid.innerHTML = list.map((p, index) => {
+            grid.innerHTML = list.map((p) => {
                 const originalIndex = products.findIndex(prod => prod.id === p.id);
                 const inCompare = compareList.some(item => item.id === p.id);
+                const inWishlist = wishlist.some(item => item.id === p.id);
+                const stock = getStockStatus(p.stock);
                 
                 return `
                 <article class="product-card" data-id="${p.id}" tabindex="0">
+                    <!-- Wishlist Button -->
+                    <button class="wishlist-btn ${inWishlist ? 'active' : ''}" 
+                            onclick="event.stopPropagation();toggleWishlist(${p.id})"
+                            title="${inWishlist ? 'Quitar de favoritos' : 'Agregar a favoritos'}">
+                        <i class="fas ${inWishlist ? 'fa-heart' : 'fa-heart'}"></i>
+                    </button>
+                    
+                    <!-- Compare Checkbox -->
                     <div class="compare-checkbox">
                         <input type="checkbox" id="compare-${p.id}" ${inCompare ? 'checked' : ''}>
                         <label for="compare-${p.id}" title="Agregar a comparador">
@@ -2930,6 +3632,13 @@
                              loading="lazy"
                              onerror="this.src='https://images.unsplash.com/photo-1581092921461-eab62e97a782?w=400&auto=format&fit=crop'">
                         <span class="product-badge">${p.category}</span>
+                        
+                        <!-- Stock Indicator -->
+                        ${stock.show ? `<div class="stock-indicator ${stock.class}">
+                            <i class="fas fa-box"></i>
+                            <span>${stock.text}</span>
+                        </div>` : ''}
+                        
                         <button class="quick-view" onclick="event.stopPropagation();openModal(${originalIndex})">
                             <i class="fas fa-eye"></i> Vista rápida
                         </button>
@@ -2955,22 +3664,20 @@
                 </article>
             `}).join('');
             
-            // Add event listeners to new cards
             setupProductCardListeners();
         }
 
         function setupProductCardListeners() {
             $$('.product-card').forEach(card => {
-                // Click to open modal
                 card.addEventListener('click', (e) => {
-                    if (!e.target.closest('.btn-cart') && !e.target.closest('.btn-quote') && !e.target.closest('.compare-checkbox')) {
+                    if (!e.target.closest('.btn-cart') && !e.target.closest('.btn-quote') && 
+                        !e.target.closest('.compare-checkbox') && !e.target.closest('.wishlist-btn')) {
                         const id = card.dataset.id;
                         const index = products.findIndex(p => p.id == id);
                         if (index !== -1) openModal(index);
                     }
                 });
                 
-                // Keyboard navigation
                 card.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
@@ -2980,7 +3687,6 @@
                     }
                 });
                 
-                // Compare checkbox
                 const checkbox = card.querySelector('.compare-checkbox input');
                 if (checkbox) {
                     checkbox.addEventListener('change', (e) => {
@@ -2989,12 +3695,9 @@
                     });
                 }
                 
-                // Add to cart button ripple
                 const cartBtn = card.querySelector('.btn-cart');
                 if (cartBtn) {
-                    cartBtn.addEventListener('click', (e) => {
-                        createRipple(e, cartBtn);
-                    });
+                    cartBtn.addEventListener('click', (e) => createRipple(e, cartBtn));
                 }
             });
         }
@@ -3003,26 +3706,22 @@
         // FILTROS Y BÚSQUEDA
         // ================================================================
         function setupFilters() {
-            // Filter buttons
             $$('.filter-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     $$('.filter-btn').forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
-                    
                     const filter = this.dataset.filter;
                     const query = $('#searchInput').value.toLowerCase();
                     filterProducts(filter, query);
                 });
             });
             
-            // Search with debounce
             const searchInput = $('#searchInput');
             const searchClear = $('#searchClear');
             
             searchInput.addEventListener('input', debounce((e) => {
                 const value = e.target.value.trim();
                 searchClear.classList.toggle('visible', value.length > 0);
-                
                 const activeFilter = $$('.filter-btn.active')[0]?.dataset.filter || 'all';
                 filterProducts(activeFilter, value);
             }, 300));
@@ -3038,11 +3737,7 @@
 
         function filterProducts(filter, query) {
             let filtered = [...products];
-            
-            if (filter !== 'all') {
-                filtered = filtered.filter(p => p.filter === filter);
-            }
-            
+            if (filter !== 'all') filtered = filtered.filter(p => p.filter === filter);
             if (query) {
                 const q = query.toLowerCase();
                 filtered = filtered.filter(p => 
@@ -3053,7 +3748,6 @@
                     p.norm.toLowerCase().includes(q)
                 );
             }
-            
             renderProducts(filtered);
             updateSearchInfo(filtered.length);
         }
@@ -3094,7 +3788,6 @@
                 compareList = compareList.filter(p => p.id !== productId);
                 showNotification('Producto removido', 'success');
             }
-            
             updateCompareUI();
             renderProducts(getCurrentFilteredProducts());
             return true;
@@ -3103,7 +3796,6 @@
         function getCurrentFilteredProducts() {
             const filter = $$('.filter-btn.active')[0]?.dataset.filter || 'all';
             const query = $('#searchInput').value.toLowerCase();
-            
             let result = [...products];
             if (filter !== 'all') result = result.filter(p => p.filter === filter);
             if (query) {
@@ -3144,7 +3836,6 @@
                 </div>
             `).join('');
             
-            // Add remove listeners
             $$('.compare-item-remove').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -3196,16 +3887,336 @@
                 html += `<tr><td><strong>${spec.label}</strong></td>`;
                 const values = compareList.map(p => p[spec.key]);
                 const isDifferent = new Set(values).size > 1;
-                
                 compareList.forEach(p => {
                     const className = isDifferent ? 'different' : 'match';
                     html += `<td class="${className}">${p[spec.key]}</td>`;
                 });
                 html += '</tr>';
             });
-            
             html += '</tbody>';
             table.innerHTML = html;
+        }
+
+        // ================================================================
+        // 360° PRODUCT VIEWER
+        // ================================================================
+        function init360Viewer(product) {
+            const viewer = $('#viewer360');
+            const img = $('#viewerImage');
+            
+            // Use first image if no 360° images available
+            const images = product.images360 && product.images360.length > 1 
+                ? product.images360 
+                : [product.image];
+            
+            viewerAngle = 0;
+            updateViewerImage(images, viewerAngle);
+            
+            // Mouse drag events
+            viewer.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                startX = e.clientX;
+                startAngle = viewerAngle;
+                viewer.style.cursor = 'grabbing';
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                const deltaX = e.clientX - startX;
+                viewerAngle = startAngle + deltaX * 0.5;
+                updateViewerImage(images, viewerAngle);
+            });
+            
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+                viewer.style.cursor = 'grab';
+            });
+            
+            // Touch events for mobile
+            viewer.addEventListener('touchstart', (e) => {
+                isDragging = true;
+                startX = e.touches[0].clientX;
+                startAngle = viewerAngle;
+            });
+            
+            document.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                const deltaX = e.touches[0].clientX - startX;
+                viewerAngle = startAngle + deltaX * 0.5;
+                updateViewerImage(images, viewerAngle);
+            });
+            
+            document.addEventListener('touchend', () => { isDragging = false; });
+            
+            // Control buttons
+            $('#viewerRotateLeft').addEventListener('click', () => {
+                viewerAngle -= 45;
+                updateViewerImage(images, viewerAngle);
+            });
+            $('#viewerRotateRight').addEventListener('click', () => {
+                viewerAngle += 45;
+                updateViewerImage(images, viewerAngle);
+            });
+            $('#viewerReset').addEventListener('click', () => {
+                viewerAngle = 0;
+                updateViewerImage(images, 0);
+            });
+            
+            // Prevent text selection while dragging
+            viewer.addEventListener('dragstart', (e) => e.preventDefault());
+        }
+
+        function updateViewerImage(images, angle) {
+            const img = $('#viewerImage');
+            const index = Math.abs(Math.round(angle / 45)) % images.length;
+            img.src = images[index];
+            img.style.transform = `scale(1.02)`;
+            setTimeout(() => img.style.transform = 'scale(1)', 150);
+        }
+
+        // ================================================================
+        // WISHLIST FUNCTIONALITY
+        // ================================================================
+        function toggleWishlist(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            
+            const index = wishlist.findIndex(p => p.id === productId);
+            const btn = event.currentTarget;
+            
+            if (index === -1) {
+                // Add to wishlist
+                wishlist.push({ ...product, addedAt: Date.now() });
+                btn.classList.add('active');
+                createConfetti(20);
+                showNotification(`♥ ${product.name} agregado a favoritos`, 'success');
+            } else {
+                // Remove from wishlist
+                wishlist.splice(index, 1);
+                btn.classList.remove('active');
+                showNotification(`${product.name} removido de favoritos`, 'success');
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('underprotection_wishlist', JSON.stringify(wishlist));
+            updateWishlistToggle();
+        }
+
+        function updateWishlistToggle() {
+            // Update toggle button badge
+            const toggle = $('#wishlistToggle');
+            const count = wishlist.length;
+            if (count > 0) {
+                toggle.classList.add('active');
+                if (!toggle.querySelector('.badge')) {
+                    const badge = document.createElement('span');
+                    badge.className = 'cart-count';
+                    badge.style.position = 'absolute';
+                    badge.style.top = '-4px';
+                    badge.style.right = '-4px';
+                    badge.style.fontSize = '9px';
+                    badge.style.padding = '2px 5px';
+                    toggle.appendChild(badge);
+                }
+                toggle.querySelector('.cart-count').textContent = count;
+            } else {
+                toggle.classList.remove('active');
+                const badge = toggle.querySelector('.cart-count');
+                if (badge) badge.remove();
+            }
+        }
+
+        function openWishlist() {
+            renderWishlistItems();
+            openModalCustom('wishlistModal');
+        }
+
+        function closeWishlist() {
+            closeModalCustom('wishlistModal');
+        }
+
+        function renderWishlistItems() {
+            const container = $('#wishlistItems');
+            const empty = $('#wishlistEmpty');
+            
+            if (wishlist.length === 0) {
+                container.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+            
+            empty.classList.add('hidden');
+            container.innerHTML = wishlist.map((p, i) => {
+                const stock = getStockStatus(p.stock);
+                return `
+                <div class="cart-item" style="padding:12px 0">
+                    <div class="cart-item-image">
+                        <img src="${p.image}" alt="${p.name}" onerror="this.src='https://images.unsplash.com/photo-1581092921461-eab62e97a782?w=100&auto=format&fit=crop'">
+                    </div>
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">${p.name}</div>
+                        <div class="cart-item-size">${p.category}</div>
+                        <div class="stock-indicator ${stock.class}" style="position:static;margin-top:6px">
+                            ${stock.text}
+                        </div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:6px">
+                        <button class="btn-cart" onclick="addToCartFromWishlist(${p.id})" style="padding:8px">
+                            <i class="fas fa-cart-plus"></i>
+                        </button>
+                        <button class="cart-item-remove" onclick="removeFromWishlist(${i})" title="Quitar de favoritos">
+                            <i class="fas fa-heart-broken"></i>
+                        </button>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function removeFromWishlist(index) {
+            const product = wishlist[index];
+            wishlist.splice(index, 1);
+            localStorage.setItem('underprotection_wishlist', JSON.stringify(wishlist));
+            renderWishlistItems();
+            updateWishlistToggle();
+            showNotification(`${product.name} removido`, 'success');
+        }
+
+        function addToCartFromWishlist(productId) {
+            const product = products.find(p => p.id === productId) || wishlist.find(p => p.id === productId);
+            if (product) {
+                addToCart(product, 'M', 1);
+                // Remove from wishlist after adding to cart (optional)
+                // removeFromWishlist(wishlist.findIndex(p => p.id === productId));
+            }
+        }
+
+        // ================================================================
+        // SIZE GUIDE MODAL
+        // ================================================================
+        function openSizeGuide() {
+            openModalCustom('sizeGuideModal');
+            setupSizeConverter();
+        }
+
+        function closeSizeGuide() {
+            closeModalCustom('sizeGuideModal');
+        }
+
+        function switchSizeTab(tab) {
+            $$('.size-guide-tab').forEach(t => t.classList.remove('active'));
+            $(`.size-guide-tab[data-tab="${tab}"]`).classList.add('active');
+            
+            $$('.size-guide-content').forEach(c => c.classList.remove('active'));
+            $(`#tab-${tab}`).classList.add('active');
+        }
+
+        function setupSizeConverter() {
+            const from = $('#convertFrom');
+            const size = $('#convertSize');
+            const to = $('#convertTo');
+            const result = $('#converterResult');
+            
+            function convert() {
+                const conversions = {
+                    'co-us': { XS:'XS', S:'S', M:'M', L:'L', XL:'XL', '2XL':'XXL' },
+                    'co-eu': { XS:'44', S:'46', M:'48', L:'50', XL:'52', '2XL':'54' },
+                    'co-uk': { XS:'34', S:'36', M:'38', L:'40', XL:'42', '2XL':'44' },
+                    'us-co': { XS:'XS', S:'S', M:'M', L:'L', XL:'XL', XXL:'2XL' },
+                    'eu-co': { '44':'XS', '46':'S', '48':'M', '50':'L', '52':'XL', '54':'2XL' },
+                    'uk-co': { '34':'XS', '36':'S', '38':'M', '40':'L', '42':'XL', '44':'2XL' }
+                };
+                
+                const key = `${from.value}-${to.value}`;
+                const converted = conversions[key]?.[size.value] || size.value;
+                const flags = { co:'🇨🇴', us:'🇺🇸', eu:'🇪🇺', uk:'🇬🇧' };
+                
+                result.textContent = `${size.value} (${flags[from.value]}) = ${converted} (${flags[to.value]})`;
+            }
+            
+            [from, size, to].forEach(el => {
+                el.addEventListener('change', convert);
+            });
+            
+            convert(); // Initial conversion
+        }
+
+        // ================================================================
+        // DELIVERY ESTIMATOR
+        // ================================================================
+        function calculateDelivery() {
+            const city = $('#deliveryCity').value;
+            const result = $('#deliveryResult');
+            const time = $('#deliveryTime');
+            const details = $('#deliveryDetails');
+            
+            if (!city) {
+                showNotification('⚠ Selecciona una ciudad', 'warning');
+                return;
+            }
+            
+            // Delivery times by city (in hours)
+            const deliveries = {
+                bogota: { time: '24 horas', details: 'Envío express disponible' },
+                medellin: { time: '24-48 horas', details: 'Entrega garantizada' },
+                cali: { time: '48 horas', details: 'Envío estándar' },
+                barranquilla: { time: '48-72 horas', details: 'Transporte terrestre' },
+                cartagena: { time: '48-72 horas', details: 'Transporte terrestre' },
+                bucaramanga: { time: '48 horas', details: 'Ruta directa' },
+                pereira: { time: '48 horas', details: 'Eje cafetero' },
+                otras: { time: '3-5 días', details: 'Consulta por tu ubicación exacta' }
+            };
+            
+            const delivery = deliveries[city] || deliveries.otras;
+            
+            // Animate result
+            result.classList.remove('show');
+            setTimeout(() => {
+                time.textContent = delivery.time;
+                details.textContent = delivery.details;
+                result.classList.add('show');
+            }, 200);
+            
+            showNotification('🚚 Tiempo de entrega calculado', 'success');
+        }
+
+        // ================================================================
+        // VIDEO MODAL
+        // ================================================================
+        function openVideoModal() {
+            if (!currentProduct) return;
+            
+            $('#videoPlaceholder').style.display = 'flex';
+            // Clear any existing iframe
+            const container = $('#videoContainer');
+            const existingIframe = container.querySelector('iframe');
+            if (existingIframe) existingIframe.remove();
+            
+            openModalCustom('videoModal');
+        }
+
+        function closeVideoModal() {
+            closeModalCustom('videoModal');
+            // Stop video when closing
+            const iframe = $('#videoContainer').querySelector('iframe');
+            if (iframe) {
+                iframe.src = iframe.src; // Reset to stop playback
+            }
+        }
+
+        function loadVideo() {
+            if (!currentProduct?.videoUrl) return;
+            
+            const placeholder = $('#videoPlaceholder');
+            const container = $('#videoContainer');
+            
+            placeholder.style.display = 'none';
+            
+            const iframe = document.createElement('iframe');
+            iframe.src = currentProduct.videoUrl;
+            iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+            iframe.allowFullscreen = true;
+            
+            container.appendChild(iframe);
         }
 
         // ================================================================
@@ -3214,12 +4225,17 @@
         function openModal(index) {
             currentProduct = products[index];
             
+            // Setup 360° viewer
+            init360Viewer(currentProduct);
+            
             // Populate modal
             const modalImg = $('#modalImage');
-            modalImg.src = currentProduct.image;
-            modalImg.onerror = function() {
-                this.src = 'https://images.unsplash.com/photo-1581092921461-eab62e97a782?w=400&auto=format&fit=crop';
-            };
+            if (modalImg) {
+                modalImg.src = currentProduct.image;
+                modalImg.onerror = function() {
+                    this.src = 'https://images.unsplash.com/photo-1581092921461-eab62e97a782?w=400&auto=format&fit=crop';
+                };
+            }
             
             $('#modalCategory').textContent = currentProduct.category;
             $('#modalTitle').textContent = currentProduct.name;
@@ -3230,12 +4246,25 @@
             $('#specNorm').textContent = currentProduct.norm;
             $('#specWeight').textContent = currentProduct.weight;
             
+            // Stock indicator in modal
+            const stock = getStockStatus(currentProduct.stock);
+            const modalStock = $('#modalStock');
+            const stockText = $('#stockText');
+            if (modalStock && stockText) {
+                modalStock.className = `stock-indicator ${stock.class}`;
+                stockText.textContent = stock.text;
+            }
+            
             // Reset form
             quantity = 1;
             $('#qtyValue').textContent = quantity;
             $$('.size-btn').forEach(btn => btn.classList.remove('active'));
             $$('.size-btn')[1]?.classList.add('active');
             selectedSize = 'S';
+            
+            // Reset delivery estimator
+            $('#deliveryCity').value = '';
+            $('#deliveryResult').classList.remove('show');
             
             openModalCustom('productModal');
         }
@@ -3245,7 +4274,6 @@
             modal.classList.add('active');
             document.body.classList.add('no-scroll');
             
-            // Close on backdrop click
             modal.addEventListener('click', function handler(e) {
                 if (e.target === modal) {
                     closeModalCustom(modalId);
@@ -3339,7 +4367,6 @@
         function toggleCart() {
             const sidebar = $('#cartSidebar');
             sidebar.classList.toggle('active');
-            
             if (sidebar.classList.contains('active')) {
                 document.body.classList.add('no-scroll');
             } else {
@@ -3385,7 +4412,6 @@
             
             total.textContent = 'Cotización personalizada';
             
-            // Add remove listeners
             $$('.cart-item-remove').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -3422,7 +4448,6 @@
             notification.className = 'notification';
             notification.classList.add(type, 'active');
             
-            // Auto hide
             setTimeout(() => {
                 notification.classList.remove('active');
             }, 3500);
@@ -3436,14 +4461,12 @@
             const backToTop = $('#backToTop');
             
             window.addEventListener('scroll', debounce(() => {
-                // Header effect
                 if (window.scrollY > 50) {
                     header.classList.add('scrolled');
                 } else {
                     header.classList.remove('scrolled');
                 }
                 
-                // Back to top button
                 if (window.scrollY > 400) {
                     backToTop.classList.add('visible');
                 } else {
@@ -3451,7 +4474,6 @@
                 }
             }, 100));
             
-            // Back to top click
             backToTop.addEventListener('click', () => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 createRipple(event, backToTop);
@@ -3467,7 +4489,6 @@
                 menu.classList.toggle('active');
             });
             
-            // Close menu when clicking a link
             $$('#navMenu a').forEach(link => {
                 link.addEventListener('click', () => {
                     btn.classList.remove('active');
@@ -3485,25 +4506,16 @@
                         const headerOffset = 80;
                         const elementPosition = target.getBoundingClientRect().top;
                         const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-                        
                         window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
                     }
                 });
             });
         }
 
-        // ================================================================
-        // FEATURED PRODUCT
-        // ================================================================
         function setupFeatured() {
-            $('#viewFeatured').addEventListener('click', () => {
-                openModal(0); // Open first product (featured)
-            });
+            $('#viewFeatured').addEventListener('click', () => openModal(0));
         }
 
-        // ================================================================
-        // QUOTE & CHECKOUT
-        // ================================================================
         function requestQuote() {
             closeModal();
             showNotification('📝 Abriendo formulario de cotización...', 'success');
@@ -3524,9 +4536,6 @@
             }, 1200);
         }
 
-        // ================================================================
-        // PDF GENERATION (Simple text version)
-        // ================================================================
         function generatePDF() {
             if (compareList.length === 0) {
                 showNotification('⚠ No hay productos para comparar', 'warning');
@@ -3537,7 +4546,6 @@
             content.innerHTML = `
                 <h1 style="color:#1A1A2E;margin-bottom:20px">UnderProtection - Comparativo Técnico</h1>
                 <p style="margin-bottom:30px;color:#6C757D">Generado: ${new Date().toLocaleDateString('es-CO')}</p>
-                
                 <table style="width:100%;border-collapse:collapse;margin-bottom:30px">
                     <thead>
                         <tr style="background:#f8f9fa">
@@ -3558,14 +4566,11 @@
                         `).join('')}
                     </tbody>
                 </table>
-                
                 <p style="color:#6C757D;font-size:14px">
                     © 2026 UNDERPROTECTION BY SAFETYPRO S.A.S.<br>
                     ventas@underprotection.co | 300 123 4567
                 </p>
             `;
-            
-            // Trigger print
             window.print();
             showNotification('✓ PDF generado', 'success');
         }
@@ -3574,15 +4579,14 @@
         // INICIALIZACIÓN
         // ================================================================
         function init() {
-            // Hide loading overlay
             setTimeout(() => {
                 $('#loadingOverlay').classList.add('hidden');
             }, 800);
             
-            // Initialize
             initTheme();
             renderProducts(products);
             loadCart();
+            updateWishlistToggle();
             setupFilters();
             setupHeaderScroll();
             setupMobileMenu();
@@ -3592,6 +4596,7 @@
             
             // Event listeners
             $('#themeToggle').addEventListener('click', toggleTheme);
+            $('#wishlistToggle').addEventListener('click', openWishlist);
             $('#cartBtn').addEventListener('click', toggleCart);
             $('#closeCart').addEventListener('click', toggleCart);
             $('#closeModal').addEventListener('click', closeModal);
@@ -3609,17 +4614,24 @@
                 btn.addEventListener('click', (e) => createRipple(e, btn));
             });
             
-            // Keyboard support for modals
+            // Keyboard support
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
                     closeModal();
                     closeCompareModal();
+                    closeSizeGuide();
+                    closeVideoModal();
+                    closeWishlist();
                     if ($('#cartSidebar').classList.contains('active')) toggleCart();
                 }
             });
+            
+            // Prevent modal scroll
+            $$('.modal-content').forEach(modal => {
+                modal.addEventListener('wheel', (e) => e.stopPropagation(), { passive: false });
+            });
         }
 
-        // Start everything when DOM is ready
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
