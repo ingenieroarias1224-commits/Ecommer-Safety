@@ -40,7 +40,6 @@
             --transition-fast: all 0.15s ease;
             --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             
-            /* Animaciones */
             --animate-fade: fade-in 0.4s ease forwards;
             --animate-slide-up: slide-up 0.5s ease forwards;
             --animate-scale: scale-in 0.3s ease forwards;
@@ -64,7 +63,7 @@
         }
 
         /* ============================================
-           KEYFRAMES PARA ANIMACIONES
+           KEYFRAMES
            ============================================ */
         @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slide-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -118,6 +117,200 @@
         .gap-2 { gap: 8px; }
         .gap-4 { gap: 16px; }
         .gap-6 { gap: 24px; }
+
+        /* ============================================
+           MAIN BANNER STYLES
+           ============================================ */
+        .main-banner {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e8ba3 100%);
+        }
+
+        .banner-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .banner-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            transition: transform 0.5s ease;
+        }
+
+        .main-banner:hover .banner-image {
+            transform: scale(1.02);
+        }
+
+        .banner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                135deg, 
+                rgba(26, 26, 46, 0.85) 0%, 
+                rgba(26, 26, 46, 0.4) 50%, 
+                rgba(255, 107, 0, 0.3) 100%
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .main-banner:hover .banner-overlay {
+            opacity: 1;
+        }
+
+        .banner-content {
+            text-align: center;
+            color: #fff;
+            padding: 40px;
+            max-width: 700px;
+            animation: slide-up 0.8s ease;
+        }
+
+        .banner-title {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            letter-spacing: -1px;
+        }
+
+        .banner-subtitle {
+            font-size: 20px;
+            margin-bottom: 32px;
+            opacity: 0.95;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .banner-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-banner-primary,
+        .btn-banner-secondary {
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-banner-primary {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(255, 107, 0, 0.4);
+        }
+
+        .btn-banner-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(255, 107, 0, 0.5);
+        }
+
+        .btn-banner-secondary {
+            background: transparent;
+            color: #fff;
+            border: 2px solid #fff;
+        }
+
+        .btn-banner-secondary:hover {
+            background: #fff;
+            color: var(--secondary);
+            transform: translateY(-3px);
+        }
+
+        @keyframes slide-up {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive Banner */
+        @media (max-width: 1024px) {
+            .main-banner {
+                height: 400px;
+            }
+            .banner-title {
+                font-size: 36px;
+            }
+            .banner-subtitle {
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-banner {
+                height: 350px;
+            }
+            .banner-content {
+                padding: 24px;
+            }
+            .banner-title {
+                font-size: 28px;
+            }
+            .banner-subtitle {
+                font-size: 16px;
+                margin-bottom: 24px;
+            }
+            .banner-buttons {
+                flex-direction: column;
+                gap: 12px;
+            }
+            .btn-banner-primary,
+            .btn-banner-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-banner {
+                height: 300px;
+            }
+            .banner-title {
+                font-size: 24px;
+            }
+            .banner-subtitle {
+                font-size: 14px;
+            }
+        }
 
         /* ============================================
            UTILIDADES DE ANIMACIÓN
@@ -2656,6 +2849,32 @@
         </div>
     </div>
 
+    <!-- Banner Principal -->
+    <section class="main-banner">
+        <div class="banner-container">
+            <img src="IMAGENES/banner-inmadica.jpg" 
+                 alt="Inmadica Andina - Expertos en Seguridad Industrial - UnderProtection by SafetyPro"
+                 class="banner-image"
+                 loading="eager">
+            
+            <!-- Overlay con texto animado -->
+            <div class="banner-overlay">
+                <div class="banner-content animate-on-scroll">
+                    <h1 class="banner-title">Expertos en Seguridad Industrial</h1>
+                    <p class="banner-subtitle">Protección certificada para la industria colombiana</p>
+                    <div class="banner-buttons">
+                        <a href="#productos" class="btn-banner-primary">
+                            <i class="fas fa-catalog"></i> Ver Productos
+                        </a>
+                        <a href="#contacto" class="btn-banner-secondary">
+                            <i class="fas fa-phone"></i> Contáctanos
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Top Bar -->
     <div class="top-bar">
         <div class="container">
@@ -3563,7 +3782,7 @@
 
         function toggleTheme() {
             currentTheme = currentTheme === 'light' ? 'dark' : 'light';
-            document.documentElement.setAttribute('-theme', currentTheme);
+            document.documentElement.setAttribute('data-theme', currentTheme);
             localStorage.setItem('theme', currentTheme);
             updateThemeIcon();
             showNotification(currentTheme === 'dark' ? '🌙 Modo oscuro' : '☀️ Modo claro', 'success');
@@ -4085,8 +4304,6 @@
             const product = products.find(p => p.id === productId) || wishlist.find(p => p.id === productId);
             if (product) {
                 addToCart(product, 'M', 1);
-                // Remove from wishlist after adding to cart (optional)
-                // removeFromWishlist(wishlist.findIndex(p => p.id === productId));
             }
         }
 
@@ -4593,6 +4810,7 @@
             setupSmoothScroll();
             setupFeatured();
             setupScrollAnimations();
+            setupBannerAnimation();
             
             // Event listeners
             $('#themeToggle').addEventListener('click', toggleTheme);
@@ -4630,6 +4848,16 @@
             $$('.modal-content').forEach(modal => {
                 modal.addEventListener('wheel', (e) => e.stopPropagation(), { passive: false });
             });
+        }
+
+        // Banner Animation
+        function setupBannerAnimation() {
+            const banner = document.querySelector('.animate-on-scroll');
+            if (banner) {
+                setTimeout(() => {
+                    banner.classList.add('visible');
+                }, 300);
+            }
         }
 
         document.addEventListener('DOMContentLoaded', init);
