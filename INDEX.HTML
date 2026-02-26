@@ -122,21 +122,22 @@
            MAIN BANNER STYLES
            ============================================ */
         .main-banner {
-            position: relative;
-            width: 100%;
-            height: 500px;
-            overflow: hidden;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e8ba3 100%);
-        }
+    position: relative;
+    width: 100%;
+    height: auto; /* ← IMPORTANTE: Cambia height fijo a auto */
+    max-height: 400px; /* ← Altura máxima opcional */
+    overflow: hidden;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e8ba3 100%);
+}
 
         .banner-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
         .banner-image {
             width: 100%;
@@ -2848,50 +2849,13 @@
             <p class="loader-text">Cargando experiencia...</p>
         </div>
     </div>
-
-    <!-- Banner Principal -->
-    <section class="main-banner">
-        <div class="banner-container">
-            <img src="IMAGENES/banner-inmadica.jpg" 
-                 alt="Inmadica Andina - Expertos en Seguridad Industrial - UnderProtection by SafetyPro"
-                 class="banner-image"
-                 loading="eager">
-            
-            <!-- Overlay con texto animado -->
-            <div class="banner-overlay">
-                <div class="banner-content animate-on-scroll">
-                    <h1 class="banner-title">Expertos en Seguridad Industrial</h1>
-                    <p class="banner-subtitle">Protección certificada para la industria colombiana</p>
-                    <div class="banner-buttons">
-                        <a href="#productos" class="btn-banner-primary">
-                            <i class="fas fa-catalog"></i> Ver Productos
-                        </a>
-                        <a href="#contacto" class="btn-banner-secondary">
-                            <i class="fas fa-phone"></i> Contáctanos
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Top Bar -->
-    <div class="top-bar">
-        <div class="container">
-            <a href="tel:+573001234567"><i class="fas fa-phone"></i> 300 123 4567</a>
-            <a href="https://wa.me/573001234567" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-        </div>
-    </div>
-
-    <!-- Header -->
+<!-- Header -->
     <header id="header">
         <div class="header-main">
             <div class="container">
                 <a href="#" class="logo">
                     <i class="fas fa-shield-alt"></i>
-                    Under<span>Protection</span>
-                </a>
-                
+                   
                 <div class="search-container">
                     <i class="fas fa-search search-icon"></i>
                     <input type="search" class="search-input" id="searchInput" 
@@ -2930,6 +2894,42 @@
             </div>
         </div>
     </header>
+
+    <!-- Banner Principal -->
+    <section class="main-banner">
+        <div class="banner-container">
+            <img src="IMAGENES\banner-inmadica.jpg" 
+                 alt="Inmadica Andina - Expertos en Seguridad Industrial - UnderProtection by SafetyPro"
+                 class="banner-image"
+                 loading="eager">
+            
+            <!-- Overlay con texto animado -->
+            <div class="banner-overlay">
+                <div class="banner-content animate-on-scroll">
+                    <h1 class="banner-title">Expertos en Seguridad Industrial</h1>
+                    <p class="banner-subtitle">Protección certificada para la industria colombiana</p>
+                    <div class="banner-buttons">
+                        <a href="#productos" class="btn-banner-primary">
+                            <i class="fas fa-catalog"></i> Ver Productos
+                        </a>
+                        <a href="#contacto" class="btn-banner-secondary">
+                            <i class="fas fa-phone"></i> Contáctanos
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="container">
+            <a href="tel:+573008339461"><i class="fas fa-phone"></i> 300 833 9461</a>
+            <a href="https://wa.me/573008339461" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+        </div>
+    </div>
+
+    
 
     <!-- Hero -->
     <section class="hero">
@@ -3025,29 +3025,29 @@
                      onerror="this.src='https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=800&auto=format&fit=crop'">
             </div>
             <div class="featured-content">
-                <h2>Producto <span>Estrella</span> 2026</h2>
-                <h3>ARCSHIELD ULTRA PRO</h3>
+                <h2>Producto <span>Estrella</span> FEBRERO </h2>
+                <h3>OVEROL NAVY CAT2</h3>
                 <p>Overol de máxima protección contra arco eléctrico para electricistas y técnicos de subestaciones.</p>
                 <div class="featured-specs">
                     <div class="spec-item">
                         <div class="spec-icon"><i class="fas fa-tshirt"></i></div>
                         <div class="spec-title">Material</div>
-                        <div class="spec-value">Nomex® IIIA</div>
+                        <div class="spec-value">ALGODON TRATADO 8812</div>
                     </div>
                     <div class="spec-item">
                         <div class="spec-icon"><i class="fas fa-bolt"></i></div>
                         <div class="spec-title">ATPV</div>
-                        <div class="spec-value">40 cal/cm²</div>
+                        <div class="spec-value"> 11 cal/cm²</div>
                     </div>
                     <div class="spec-item">
                         <div class="spec-icon"><i class="fas fa-shield-alt"></i></div>
                         <div class="spec-title">Antiestático</div>
-                        <div class="spec-value">ATEX Cat.3</div>
+                        <div class="spec-value">PRECIO $ 350.000</div>
                     </div>
                     <div class="spec-item">
                         <div class="spec-icon"><i class="fas fa-ruler-combined"></i></div>
                         <div class="spec-title">Tallas</div>
-                        <div class="spec-value">XS a 4XL</div>
+                        <div class="spec-value">28 a 62 </div>
                     </div>
                 </div>
                 <div class="hero-buttons">
@@ -3145,10 +3145,10 @@
             <h2>¿Necesitas una Cotización Personalizada?</h2>
             <p>Un especialista certificado te contactará en menos de 2 horas con precios corporativos.</p>
             <div class="cta-buttons">
-                <a href="tel:+573001234567" class="btn btn-white">
+                <a href="tel:+573008339461" class="btn btn-white">
                     <i class="fas fa-phone"></i> Llamar
                 </a>
-                <a href="https://wa.me/573001234567" class="btn btn-outline-white" target="_blank" rel="noopener">
+                <a href="https://wa.me/573008339461" class="btn btn-outline-white" target="_blank" rel="noopener">
                     <i class="fab fa-whatsapp"></i> WhatsApp
                 </a>
                 <a href="mailto:ventas@underprotection.co" class="btn btn-outline-white">
